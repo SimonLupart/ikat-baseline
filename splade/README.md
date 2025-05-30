@@ -1,6 +1,4 @@
-# Tutorial: Neural Conversational Search - SPLADE
-
-**Authors:** Simon Lupart - IRLab@UvA
+# Neural Conversational Search - SPLADE
 
 ---
 
