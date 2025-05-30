@@ -1,10 +1,9 @@
-## Topics and QRels:
-Topics and QRels are open access and can be downloaded throught the dl_ikat.sh script.
+## Topics and QRels
+* Topics and QRels are open access and can be downloaded throught the dl_ikat.sh script.
 
-## Collection iKAT:
-[[guidelines]](https://www.trecikat.com/guidelines/#collection)
+## Collection iKAT [[guidelines]](https://www.trecikat.com/guidelines/#collection)
 
-The text collection contains a subset of ClueWeb22 documents, prepared by the organizers in collaboration with CMU. Documents have then been split into ~116M passages. The goal is to retrieve passages from target open-domain text collections.
+The text collection of iKAT is a subset of ClueWeb22 documents, prepared by the organizers in collaboration with CMU. Documents have then been split into ~116M passages. The goal is to retrieve passages from target open-domain text collections.
 
 ### License for ClueWeb22-B
 Getting the license to use the collection can be time-consuming and would be handled by CMU, not the iKAT organizers. Please follow these steps to get your data license ASAP:
@@ -13,7 +12,7 @@ Getting the license to use the collection can be time-consuming and would be han
 
 2. Once you have the license, send a mail to Andrew Ramsay (andrew.ramsay@glasgow.ac.uk) to have access to a download link with the preprocessed iKAT passage collection, and other resources such as Lucene and SPLADE indexes.
 
-Please give enough time to the CMU licensing office to accept your request.
+> Please give enough time to the CMU licensing office to accept your request.
 
 CMU requires a signature from the organization (i.e., the university or company), not an individual who wants to use the data. This can slow down the process at your end too. So, it’s useful to start the process ASAP.
 If you already have an accepted license for ClueWeb22, you do not need a new form. Please let us know if that is the case.

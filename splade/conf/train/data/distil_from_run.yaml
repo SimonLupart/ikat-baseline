@@ -4,12 +4,6 @@ type: json
 TRAIN:
   DATASET_PATH: ??
   D_COLLECTION_PATH: ??
-  Q_COLLECTION_PATH: ?? #todo
-  QREL_PATH: ?? #todo
-
-# VALIDATION_FULL_RANKING:
-#   D_COLLECTION_PATH: /projects/0/prjs0871/DATA/splade/val_retrieval/msmarco/collection
-#   Q_COLLECTION_PATH: /projects/0/prjs0871/DATA/splade/val_retrieval/msmarco/queries
-#   QREL_PATH: /projects/0/prjs0871/DATA/splade/val_retrieval/msmarco/qrel.json
-#   TOP_K: 500
+  Q_COLLECTION_PATH: ??
+  QREL_PATH: ??
 

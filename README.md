@@ -3,27 +3,30 @@
 This repository provide baselines and tools for the **TREC iKAT** track: the *Interactive Knowledge Assistance Track* at TREC. This track focuses on **neural conversational search** with user personalization, context, and goal-driven information seeking.
 
 
-The TREC iKAT track models **goal-oriented conversations** where a user interacts with a search agent to complete a complex task (e.g., finding a university, preparing for a trip, obtaining a hunting license). The agent can use both dialogue history and user profile information (PTKB) to personalize and adapt its retrieval. See guidelines for more details (https://www.trecikat.com/guidelines/)[https://www.trecikat.com/guidelines/].
+The TREC iKAT track models **goal-oriented conversations** where a user interacts with a search agent to complete a complex task (e.g., finding a university, preparing for a trip, obtaining a hunting license). The agent can use both dialogue history and user profile information (PTKB) to personalize and adapt its retrieval. See [guidelines](https://www.trecikat.com/guidelines/) for more details.
 
-
-Example of information seeking conversation:
-```text
-PTKB: I live in the Netherlands. I have a bachelor’s degree in computer science from Tilburg University.
-
-[User]: I want to start my master’s degree, can you help me with finding a university?
-[System]: Do you want to study abroad?
-[User]: No, I don't want to go abroad.
-[System]: I can help you find a university to continue your studies in the Netherlands as a computer science student. Take a look at these Top Computer Science Universities in the Netherlands: 1. Delft University of Technology. 2. Eindhoven University of Technology 3. Vrije Universiteit Amsterdam.
-[User]: ...
-```
-
-We provide in this repository:
+#### We provide in this repository:
 
 * SPLADE-based retrieval [[SPLADE Retrieval]](#splade-retrieval)
 * Query rewriting with PTKB integration (manual and GPT-based)
 * BM25 baselines [[BM25 Retrieval]](#bm25-retrieval)
 * Cross-encoder reranking (MiniLM and DeBERTa) [[Reranking]](#reranking)
-* Evaluation of the runs [[Performance]](#performance)
+* Evaluation of the runs [[Results]](#results)
+
+
+#### Example of information seeking conversation:
+
+> **PTKB**: *I live in the Netherlands. I have a bachelor’s degree in computer science from Tilburg University.*
+
+**[User]**: `I want to start my master’s degree, can you help me with finding a university?`  
+**[System]**: *Do you want to study abroad?*  
+**[User]**: `No, I don't want to go abroad.`  
+**[System]**: *I can help you find a university to continue your studies in the Netherlands as a computer science student. Here are the Top Computer Science Universities in the Netherlands*:
+1. *Delft University of Technology*
+2. *Eindhoven University of Technology*
+3. *Vrije Universiteit Amsterdam*
+
+**[User]**: `...`
 
 ## Installation
 
@@ -41,7 +44,6 @@ Download the iKAT dataset:
 ```bash
 bash ./DATA/dl_ikat.sh
 ```
-Provide example of ikat turn with ptkb
 
 Also required:
 * SPLADE NumBa index (see DATA/README.md)
@@ -56,7 +58,7 @@ Running SPLADE retrieval on human manual rewritten queries (both iKAT 2023 and i
 ```bash
 export SPLADE_CONFIG_NAME="config_hf_splade_ikat.yaml"
 
-index_dir=/ivi/ilps/projects/ikat24/splade_index_website/splade_index/
+index_dir=path/to/splade_index
 eval_queries=[DATA/queries_manual_2023.tsv,DATA/queries_manual_2024.tsv]
 out_dir=EXP/manual_splade
 
@@ -74,12 +76,12 @@ export OPENAI_API_KEY="your_openai_key"
 python DATA/rewrite_gpt_ikat.py
 ```
 
-Now running SPLADE on the rewrite:
+Now running SPLADE on the GPT40-mini rewrite:
 
 ```bash
 export SPLADE_CONFIG_NAME="config_hf_splade_ikat.yaml"
 
-index_dir=/ivi/ilps/projects/ikat24/splade_index_website/splade_index/
+index_dir=path/to/splade_index
 eval_queries=[DATA/queries_gpt4o_2023.tsv,DATA/queries_gpt4o_2024.tsv]
 out_dir=EXP/gpt4o_splade
 
@@ -95,13 +97,13 @@ Similarly you can do retrieval with BM25, this requires less ressource.
 
 With gpt4o-mini rewrite (on iKAT 2024):
 ```bash
-python -m bm25.retrieve --index_path /ivi/ilps/projects/TREC-Ikat-CW22/passage_index/trec_ikat_2023_passage_index \
+python -m bm25.retrieve --index_path path/to/pyserini_index \
                         --topics DATA/queries_gpt4o_2024.tsv \
                         --output EXP/gpt4o_bm25/IKAT2024/run.json
 ```
 
 You can evaluate the runs with:
-> For evaluate we use binary qrels for recall and mrr, and the graded relevance for ndcg.
+> For evaluate we use the binary qrels for recall and mrr, and the graded relevance for ndcg.
 
 ```bash
 python -m splade.evaluate --run_dir EXP/gpt4o_bm25/IKAT2024/run.json \
@@ -111,23 +113,23 @@ python -m splade.evaluate --run_dir EXP/gpt4o_bm25/IKAT2024/run.json \
 
 ## Reranking
 
-For reranking we also use the lucene index, to load the text from the retrieved documents id.
+For reranking we also use the pyserini index, to load the text from the retrieved documents id.
 
 ```bash
-python -m rerank.rerank --index_path /ivi/ilps/projects/TREC-Ikat-CW22/passage_index/trec_ikat_2023_passage_index \
+python -m rerank.rerank --index_path path/to/pyserini_index \
                         --model naver/trecdl22-crossencoder-debertav3 \
                         --run EXP/gpt4o_splade/IKAT2024/run.json \
                         --query_file DATA/queries_gpt4o_2024.tsv \
                         --output EXP/gpt4o_splade_rerank/IKAT2024/run.json
 
-python -m rerank.rerank --index_path /ivi/ilps/projects/TREC-Ikat-CW22/passage_index/trec_ikat_2023_passage_index \
+python -m rerank.rerank --index_path path/to/pyserini_index \
                         --model naver/trecdl22-crossencoder-debertav3 \
                         --run EXP/gpt4o_bm25/IKAT2024/run.json \
                         --query_file DATA/queries_gpt4o_2024.tsv \
                         --output EXP/gpt4o_bm25_rerank/IKAT2024/run.json
 ```
 
-can use `cross-encoder/ms-marco-MiniLM-L-6-v2`, or run it on iKAT 2023.
+You can use `naver/trecdl22-crossencoder-debertav3`, `cross-encoder/ms-marco-MiniLM-L-6-v2` or any HuggingFace models. This can also be run on iKAT 2023.
 
 Similarly you can evaluate the produced runs:
 
@@ -138,11 +140,11 @@ python -m splade.evaluate --run_dir EXP/gpt4o_splade_rerank/IKAT2024/run.json \
                           --qrel_binary_file_path DATA/2024_test_qrels_binary.json
 
 ```
-## Performance
+## Results
 
 We provide here a brief summary of several produced runs:
 
-### IKAT23 Results
+### IKAT 2023
 
 | Model     | Rerank             | Rewrite | nDCG@10 | Recall@100 | MRR@1000 |
 |-----------|--------------------|---------|---------|------------|----------|
@@ -151,9 +153,9 @@ We provide here a brief summary of several produced runs:
 | BM25      | -                  | GPT4o-mini   |    0.1255      |      0.1441      |     0.1822     |
 | SPLADE    | -                  | GPT4o-mini   |     0.1849     | 0.1975           |     0.3052     |
 
-> Note that the pool of assessed passages is biased toward BM25.
+> Note that the pool of assessed passages in iKAT 2023 was biased toward BM25.
 
-### IKAT24 Results
+### IKAT 2024
 
 | Model     | Rerank             | Rewrite | nDCG@10 | Recall@100 | MRR@1000 |
 |-----------|--------------------|---------|---------|------------|----------|
@@ -163,17 +165,36 @@ We provide here a brief summary of several produced runs:
 | SPLADE    | MiniLM             | GPT4o-mini   |   0.3434        |     0.2954       |     0.5386     |
 | SPLADE    | DeBERTa            | GPT4o-mini   |   0.3876        |     0.2954       |     0.5944     |
 
-## SPLADE interactive retrieval
+## SPLADE Interactive Retrieval
 
 A iKAT searcher interactive tool. TBD.
 
----
 
-## Resources
+## Additionnal Resources
 
-* Repository for ANCE dense retrieval on iKAT [[code]](https://github.com/EricLangezaal/PersonalizedCIR)
+* Reproducibility Repository for ANCE dense retrieval on iKAT [[github]](https://github.com/EricLangezaal/PersonalizedCIR)
 
-* TREC iKAT webiste: [https://www.trecikat.com/](https://www.trecikat.com/)
+* TREC iKAT website: [https://www.trecikat.com/](https://www.trecikat.com/)
 * Official TREC website: [https://trec.nist.gov/](https://trec.nist.gov/)
 
 * Contact: [s.c.lupart@uva.nl](mailto:s.c.lupart@uva.nl)
+
+## Citations
+
+Please cite our TREC iKAT overview paper if you use this work:
+
+```bibtex
+@inproceedings{coordinators-trec2024-papers-proc-4,
+    author = {Mohammad Aliannejadi (University of Amsterdam), Zahra Abbasiantaeb (University of Amsterdam), Simon Lupart (University of Amsterdam), Shubham Chatterjee (University of Edinburgh), Jeffrey Dalton (University of Edinburgh), Leif Azzopardi (University of Strathclyde)},
+    title = {TREC iKAT 2024: The Interactive Knowledge Assistance Track Overview},
+    booktitle = {The Thirty-Third Text REtrieval Conference Proceedings (TREC 2024), Gaithersburg, MD, USA, November 15-18, 2024},
+    series = {NIST Special Publication},
+    volume = {1329},
+    publisher = {National Institute of Standards and Technology (NIST)},
+    year = {2024},
+    trec_org = {coordinators},
+    trec_runs = {},
+    trec_tracks = {ikat}
+   url = {https://trec.nist.gov/pubs/trec33/papers/Overview_ikat.pdf}
+}
+```
