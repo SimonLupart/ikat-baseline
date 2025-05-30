@@ -86,7 +86,7 @@ class SparseRetrieval(Evaluator):
         # unused documents => this should be tuned, currently it is set to 0
         return filtered_indexes, -scores[filtered_indexes]
 
-    def __init__(self, model, config, dim_voc, dataset_name=None, index_d=None, compute_stats=False, is_beir=False,
+    def __init__(self, model, config, dim_voc, index_d=None, compute_stats=False,
                  **kwargs):
         super().__init__(model, config, **kwargs)
         assert ("index_dir" in config and index_d is None) or (
@@ -109,14 +109,15 @@ class SparseRetrieval(Evaluator):
             self.numba_index_doc_ids[key] = value
         for key, value in self.sparse_index.index_doc_value.items():
             self.numba_index_doc_values[key] = value
-        self.out_dir = os.path.join(config["out_dir"], dataset_name) if (dataset_name is not None and not is_beir) \
-            else config["out_dir"]
         self.doc_stats = index_d["stats"] if (index_d is not None and compute_stats) else None
         self.compute_stats = compute_stats
         if self.compute_stats:
             self.l0 = L0()
+        self.out_dir=config["out_dir"]
+        self.config=config
 
-    def retrieve(self, q_loader, top_k, name=None, return_d=False, id_dict=False, threshold=0):
+    def retrieve(self, q_loader, top_k, dataset_name, name=None, return_d=False, id_dict=False, threshold=0):
+        self.out_dir = os.path.join(self.config["out_dir"], dataset_name)
         makedir(self.out_dir)
         if self.compute_stats:
             makedir(os.path.join(self.out_dir, "stats"))
@@ -125,7 +126,7 @@ class SparseRetrieval(Evaluator):
             stats = defaultdict(float)
         with torch.no_grad():
             for t, batch in enumerate(tqdm(q_loader)):
-                q_id = to_list(batch["id"])[0]
+                q_id = batch["id"][0]
                 if id_dict:
                     q_id = id_dict[q_id]
                 inputs = {k: v for k, v in batch.items() if k not in {"id"}}

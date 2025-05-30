@@ -2,18 +2,18 @@
 defaults:  # (these specify which config FILES to use)
   ############## TRAIN ###################################
   - train/config: splade
-  - train/data: distil_from_run_topiocqa
+  - train/data: distil_from_run
   - train/model: splade_cocondenser
   ############## INDEX ###################################
-  - index: topiocqa
+  - index: ikat_splade
   ############## RETRIEVE ################################
-  - retrieve_evaluate: topiocqa
+  - retrieve_evaluate: ikat
 
 # Direct PARAMETER setting
 config:  # to be provided for each run
-  checkpoint_dir: ???
-  index_dir: ???
-  out_dir: ???
+  checkpoint_dir: ??
+  index_dir: ??
+  out_dir: ??
   fp16: true
 
 hydra:

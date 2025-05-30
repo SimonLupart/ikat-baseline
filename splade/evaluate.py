@@ -1,5 +1,6 @@
 import json
 import os
+import argparse
 
 import hydra
 from omegaconf import DictConfig
@@ -39,5 +40,39 @@ def evaluate(exp_dict: DictConfig):
 
     return res_all_datasets
 
+
+def evaluate_explicit(run_dir, qrel_file_path, qrel_binary_file_path):
+    """
+    Evaluate a specific run with given qrel file and metrics.
+    """
+    res = {}
+    eval_metrics = ["mrr_10", "mrr_1000", "recall", "ndcg_cut"]
+    print(eval_metrics, qrel_file_path)
+
+    if ".json" not in run_dir:
+        run_file_path = os.path.join(run_dir, "run.json")
+    else:
+        run_file_path = run_dir
+    for metric in eval_metrics:
+        if metric in ["recall", "mrr_10", "mrr_1000"]:
+            # For recall and mrr, we use the binary qrel file
+            res.update(load_and_evaluate(qrel_file_path=qrel_binary_file_path,
+                                         run_file_path=run_file_path,
+                                         metric=metric))
+        else:
+            # For other metrics, we use the standard qrel file
+            res.update(load_and_evaluate(qrel_file_path=qrel_file_path,
+                                        run_file_path=run_file_path,
+                                        metric=metric))
+
+    out_fp = os.path.join(os.path.dirname(run_dir), "perf.json")
+    json.dump(res, open(out_fp, "a"))
+
 if __name__ == '__main__':
-    evaluate()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run_dir", required=True, help="")
+    parser.add_argument("--qrel_file_path", required=True, help="")
+    parser.add_argument("--qrel_binary_file_path", required=True, help="")
+
+    args = parser.parse_args()
+    evaluate_explicit(args.run_dir, args.qrel_file_path, args.qrel_binary_file_path)

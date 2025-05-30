@@ -2,10 +2,10 @@
 
 type: json
 TRAIN:
-  DATASET_PATH: /projects/0/prjs0871/hackathon/conv-search/DATA/run.json
-  D_COLLECTION_PATH: /projects/0/prjs0871/hackathon/conv-search/DATA/full_wiki_segments.tsv
-  Q_COLLECTION_PATH: /projects/0/prjs0871/hackathon/conv-search/DATA/queries_all.tsv #todo
-  QREL_PATH: /projects/0/prjs0871/hackathon/conv-search/DATA/qrel.json #todo
+  DATASET_PATH: ??
+  D_COLLECTION_PATH: ??
+  Q_COLLECTION_PATH: ?? #todo
+  QREL_PATH: ?? #todo
 
 # VALIDATION_FULL_RANKING:
 #   D_COLLECTION_PATH: /projects/0/prjs0871/DATA/splade/val_retrieval/msmarco/collection

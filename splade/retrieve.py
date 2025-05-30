@@ -22,20 +22,29 @@ def retrieve_evaluate(exp_dict: DictConfig):
        init_dict.model_type_or_dir=os.path.join(config.checkpoint_dir,"model")
        init_dict.model_type_or_dir_q=os.path.join(config.checkpoint_dir,"model/query") if init_dict.model_type_or_dir_q else None
 
+    # load model
     model = Splade(**init_dict)
+    # load the index
+    evaluator = SparseRetrieval(config=config, model=model,
+                            compute_stats=True, dim_voc=model.output_dim)
 
+    # run retrieval
     batch_size = 1
     # NOTE: batch_size is set to 1, currently no batched implem for retrieval (TODO)
     for data_dir in set(exp_dict["data"]["Q_COLLECTION_PATH"]):
+        if "2023" in data_dir:
+            dataset_name="IKAT2023"
+        elif "2024" in data_dir:
+            dataset_name="IKAT2024"
+        elif "2025" in data_dir:
+            dataset_name="IKAT2025"
+
         q_collection = CollectionDatasetPreLoad(data_dir=data_dir, id_style="row_id")
         q_loader = CollectionDataLoader(dataset=q_collection, tokenizer_type=model_training_config["tokenizer_type"],
                                         max_length=model_training_config["max_length"], batch_size=batch_size,
                                         shuffle=False, num_workers=1)
 
-        evaluator = SparseRetrieval(config=config, model=model, dataset_name="TOPIOCQA",
-                                compute_stats=True, dim_voc=model.output_dim)
-        evaluator.retrieve(q_loader, top_k=exp_dict["config"]["top_k"], threshold=exp_dict["config"]["threshold"])
-        evaluator = None
+        evaluator.retrieve(q_loader, top_k=exp_dict["config"]["top_k"], dataset_name=dataset_name, threshold=exp_dict["config"]["threshold"])
         gc.collect()
         torch.cuda.empty_cache()
     evaluate(exp_dict)
@@ -43,3 +52,4 @@ def retrieve_evaluate(exp_dict: DictConfig):
 
 if __name__ == "__main__":
     retrieve_evaluate()
+

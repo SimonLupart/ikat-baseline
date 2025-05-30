@@ -1,0 +1,21 @@
+# @package _global_
+
+data:
+  Q_COLLECTION_PATH: [DATA/queries_manual_2023.tsv,
+                      DATA/queries_manual_2024.tsv]
+  EVAL_QREL_PATH: [DATA/2023_test_qrels_binary.json,
+                   DATA/2023_test_qrels.json,
+                   DATA/2024_test_qrels_binary.json,
+                   DATA/2024_test_qrels.json]
+
+config:
+  top_k: 1000
+  threshold: 0
+  eval_metric: [[mrr_10, mrr_1000, recall],
+                [ndcg_cut],
+                [mrr_10, mrr_1000, recall],
+                [ndcg_cut]]
+  retrieval_name: [IKAT2023,
+                   IKAT2023,
+                   IKAT2024,
+                   IKAT2024]

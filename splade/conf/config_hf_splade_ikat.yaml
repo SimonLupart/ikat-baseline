@@ -1,12 +1,12 @@
 defaults:
 ############## TRAIN ###################################
   - train/config: splade
-  - train/data: distil_from_run_topiocqa
+  - train/data: distil_from_run
   - train/model: splade_cocondenser
 ############## INDEX ###################################
-  - index: topiocqa
+  - index: ikat_splade
 ############## RETRIEVE ################################
-  - retrieve_evaluate: topiocqa
+  - retrieve_evaluate: ikat
 
 # Direct PARAMETER setting SIGIR 23  CONFIG DENSE 32 NEG NO DISTILLATION
 init_dict:
@@ -30,7 +30,7 @@ config:
   index_dir: ??
   out_dir: ??
   fp16: true
-  hf_training: true
+  hf_training: false
   max_length: 256
   # config.lr: 2.0e-5 
 
