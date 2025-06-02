@@ -167,8 +167,24 @@ We provide here a brief summary of several produced runs:
 
 ## SPLADE Interactive Retrieval
 
-A iKAT searcher interactive tool. TBD.
+A iKAT searcher interactive tool:
 
+```bash
+export SPLADE_CONFIG_NAME="config_hf_splade_ikat.yaml"
+
+index_dir=/ivi/ilps/projects/ikat24/splade_index_website/splade_index/
+out_dir=EXP/interact_splade
+mkdir -p EXP/interact_splade
+
+lucene_index=/ivi/ilps/projects/TREC-Ikat-CW22/passage_index/trec_ikat_2023_passage_index
+temp_path_q=/tmp/temp_query.tsv
+
+python -m splade.retrieve_interactive init_dict.model_type_or_dir=naver/splade-cocondenser-ensembledistil \
+        config.pretrained_no_yamlconfig=true config.index_dir=$index_dir \
+        config.out_dir=$out_dir \
+        +config.lucene_index=$lucene_index \
+        +config.temp_path_query=$temp_path_q
+```
 
 ## Additionnal Resources
 

@@ -28,15 +28,14 @@ def retrieve_evaluate(exp_dict: DictConfig):
     model = Splade(**init_dict)
 
     # Load Lucene index using Pyserini
-    index_path = "/path/to/your/lucene/index"  # Update with your index path
+    lucene_index_path = config["lucene_index"]  # Update with your index path
     print("Loading Lucene index...")
     t0 = perf_counter()
-    searcher = LuceneSearcher(index_path)
+    searcher = LuceneSearcher(lucene_index_path)
     print("Loading index took {:.3f} sec".format(perf_counter() - t0))
 
     # Initialize SparseRetrieval once
-    evaluator = SparseRetrieval(config=config, model=model, dataset_name="ikat25",
-                                compute_stats=True, dim_voc=model.output_dim)
+    evaluator = SparseRetrieval(config=config, model=model, compute_stats=True, dim_voc=model.output_dim)
 
     print("Index loaded. Ready for interactive retrieval.")
 
@@ -56,7 +55,7 @@ def retrieve_evaluate(exp_dict: DictConfig):
                 break
 
             # Create a temporary query collection
-            temp_query_path = "/tmp/temp_query.tsv"
+            temp_query_path = config["temp_path_q"]
             with open(temp_query_path, "w") as f:
                 f.write(f"0\t{user_query}\n")
 
@@ -67,7 +66,9 @@ def retrieve_evaluate(exp_dict: DictConfig):
                                             shuffle=False, num_workers=1)
 
             # Perform retrieval
-            top_k_results = evaluator.retrieve(q_loader, top_k=exp_dict["config"]["top_k"], threshold=exp_dict["config"]["threshold"], return_d=True)
+            top_k_results = evaluator.retrieve(q_loader, top_k=exp_dict["config"]["top_k"], dataset_name="ikat2025", return_d=True, threshold=exp_dict["config"]["threshold"])
+            print(top_k_results, flush=True)
+            print(f"Retrieved {len(top_k_results['retrieval'])} passages for query: {user_query}", flush=True)
 
             # Rerank the top 100 passages
             rerank_top_k(user_query, top_k_results["retrieval"], tokenizer, cross_encoder, searcher)
