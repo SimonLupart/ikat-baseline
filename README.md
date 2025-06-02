@@ -167,7 +167,8 @@ We provide here a brief summary of several produced runs:
 
 ## SPLADE Interactive Retrieval
 
-A iKAT searcher interactive tool:
+A iKAT searcher interactive tool.
+> Need RAM
 
 ```bash
 export SPLADE_CONFIG_NAME="config_hf_splade_ikat.yaml"
@@ -183,7 +184,7 @@ python -m splade.retrieve_interactive init_dict.model_type_or_dir=naver/splade-c
         config.pretrained_no_yamlconfig=true config.index_dir=$index_dir \
         config.out_dir=$out_dir \
         +config.lucene_index=$lucene_index \
-        +config.temp_path_query=$temp_path_q
+        +config.temp_path_q=$temp_path_q
 ```
 
 ## Additionnal Resources
